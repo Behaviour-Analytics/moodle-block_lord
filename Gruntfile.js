@@ -76,24 +76,6 @@ module.exports = function(grunt) {
             dist: {
                 files: ''
             }
-        },
-        stylelint: {
-            css: ['*.css', 'css/**/*.css'],
-            less: ['*.css', 'css/**/*.css', '*.less', 'less/**/*.less']
-        },
-        less: {
-            // Production config is also available.
-            development: {
-                options: {
-                    // Specifies directories to scan for @import directives when parsing.
-                    // Default value is the directory of the source, which is probably what you want.
-                    paths: ["less/"],
-                    compress: true
-                },
-                files: {
-                    "styles.css": "less/styles.less"
-                }
-            },
         }
     });
 
