@@ -50,7 +50,7 @@ class block_lord extends block_base {
      * @return stdClass The block contents.
      */
     public function get_content() {
-        global $COURSE, $DB;
+        global $COURSE;
 
         if ($this->content !== null) {
             return $this->content;

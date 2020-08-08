@@ -78,8 +78,8 @@ module.exports = function(grunt) {
             }
         },
         stylelint: {
-            css: ['*.css', 'css/**/*.css'],
-            less: ['*.css', 'css/**/*.css', '*.less', 'less/**/*.less']
+            //css: ['*.css', 'css/**/*.css'],
+            //less: ['*.css', 'css/**/*.css', '*.less', 'less/**/*.less']
         },
         less: {
             // Production config is also available.
@@ -91,7 +91,7 @@ module.exports = function(grunt) {
                     compress: true
                 },
                 files: {
-                    "styles.css": "less/styles.less"
+                    //"styles.css": "less/styles.less"
                 }
             },
         }

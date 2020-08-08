@@ -443,37 +443,37 @@ class compare_learning_objects extends \core\task\scheduled_task {
 
         // Compare the paragraphs and sentences.
         $params = [];
-        for ($p1 = 0; $p1 < $this->maxparagraph; $p1++) {
-            if (isset($keyparas[$p1])) {
-                $keyss = block_lord_split_paragraph($keyparas[$p1]);
+        for ($p0 = 0; $p0 < $this->maxparagraph; $p0++) {
+            if (isset($keyparas[$p0])) {
+                $keyss = block_lord_split_paragraph($keyparas[$p0]);
             } else {
                 break;
             }
 
-            for ($p2 = 0; $p2 < $this->maxparagraph; $p2++) {
-                if (isset($targetparas[$p2])) {
-                    $targetss = block_lord_split_paragraph($targetparas[$p2]);
+            for ($p1 = 0; $p1 < $this->maxparagraph; $p1++) {
+                if (isset($targetparas[$p1])) {
+                    $targetss = block_lord_split_paragraph($targetparas[$p1]);
                 } else {
                     break;
                 }
 
-                for ($s1 = 0; $s1 < $this->maxsentence; $s1++) {
-                    if (isset($keyss[$s1])) {
-                        $sentence1 = $this->clean_sentence($keyss[$s1]);
+                for ($s0 = 0; $s0 < $this->maxsentence; $s0++) {
+                    if (isset($keyss[$s0])) {
+                        $sentence1 = $this->clean_sentence($keyss[$s0]);
                     } else {
                         break;
                     }
 
-                    for ($s2 = 0; $s2 < $this->maxsentence; $s2++) {
-                        if (isset($targetss[$s2])) {
-                            $sentence2 = $this->clean_sentence($targetss[$s2]);
+                    for ($s1 = 0; $s1 < $this->maxsentence; $s1++) {
+                        if (isset($targetss[$s1])) {
+                            $sentence2 = $this->clean_sentence($targetss[$s1]);
                         } else {
                             break;
                         }
 
                         // Only check the similarity if it has not been checked already.
-                        if (!isset($compared[$record->module1][$record->module2]['P'.$p1.'S'.$s1.'P'.$p2.'S'.$s2])) {
-                            self::dbug('Comparing: P'.$p1.' S'.$s1.' x P'.$p2.' S'.$s2);
+                        if (!isset($compared[$record->module1][$record->module2]['P'.$p0.'S'.$s0.'P'.$p1.'S'.$s1])) {
+                            self::dbug('Comparing: P'.$p0.' S'.$s0.' x P'.$p1.' S'.$s1);
 
                             list($similarity, $matrix) = $this->call_bridge($sentence1, $sentence2);
 
@@ -481,7 +481,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
                                 'courseid' => $record->courseid,
                                 'module1'  => $record->module1,
                                 'module2'  => $record->module2,
-                                'compared' => 'P'.$p1.'S'.$s1.'P'.$p2.'S'.$s2,
+                                'compared' => 'P'.$p0.'S'.$s0.'P'.$p1.'S'.$s1,
                                 'value'    => $similarity,
                                 'matrix'   => $matrix
                             );
@@ -526,7 +526,6 @@ class compare_learning_objects extends \core\task\scheduled_task {
      * @return array
      */
     private function get_course_data(&$course) {
-        global $DB;
 
         // Get course module information and process.
         $modinfo = get_fast_modinfo($course);
@@ -1099,7 +1098,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
      * @return array
      */
     private function do_file(&$cm) {
-        global $DB, $CFG;
+        global $DB;
 
         $resource = $DB->get_record('resource', array('id' => $cm->instance), '*', MUST_EXIST);
         $intro = $this->get_name_and_intro($resource);

@@ -264,14 +264,12 @@ function block_lord_get_cleaning_regex() {
  * @return string
  */
 function block_lord_clean_sentence(&$sentence, &$dictionary) {
-    global $DB;
 
     $regex = block_lord_get_cleaning_regex();
     $nopunctuation = preg_replace($regex, ' ', $sentence);
     $lowercase = strtolower($nopunctuation);
     $words = explode(' ', $lowercase);
     $cleaned = '';
-    $params = [];
     $seen = [];
 
     foreach ($words as $word) {
