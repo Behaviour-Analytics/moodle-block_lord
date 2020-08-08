@@ -78,8 +78,8 @@ module.exports = function(grunt) {
             }
         },
         stylelint: {
-            css: [''],
-            less: ['']
+            css: ['*.css', 'css/**/*.css'],
+            less: ['*.css', 'css/**/*.css', '*.less', 'less/**/*.less']
         },
         less: {
             // Production config is also available.
