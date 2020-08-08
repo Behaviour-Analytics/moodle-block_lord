@@ -1,0 +1,56 @@
+language: php
+
+addons:
+  postgresql: "9.4"
+
+services:
+  - mysql
+  - postgresql
+  - docker
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/.npm
+
+php:
+ - 7.1
+ - 7.2
+ - 7.3
+
+env:
+ global:
+  - IGNORE_PATHS=amd/src/d3.js,amd/src/mersennetwister.js,amd/src/nouislider.js,javascript/d3,javascript/MersenneTwister,javascript/noUiSlider,javascript/d3.geom.concaveHull
+  - MOODLE_BRANCH=MOODLE_34_STABLE
+  - MOODLE_BRANCH=MOODLE_35_STABLE
+  - MOODLE_BRANCH=MOODLE_36_STABLE
+  - MOODLE_BRANCH=MOODLE_37_STABLE
+  - MOODLE_BRANCH=MOODLE_38_STABLE
+ matrix:
+  - DB=mysqli
+  - DB=pgsql
+
+before_install:
+  - phpenv config-rm xdebug.ini
+  - nvm install 14.0
+  - nvm use 14.0
+  - cd ../..
+  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
+  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+  - docker run -d -p 127.0.0.1:4444:4444 --net=host -v /dev/shm:/dev/shm selenium/standalone-firefox:3
+
+install:
+  - moodle-plugin-ci install
+
+script:
+  - moodle-plugin-ci phplint
+  - moodle-plugin-ci phpcpd
+  - moodle-plugin-ci phpmd
+  - moodle-plugin-ci codechecker
+  - moodle-plugin-ci validate
+  - moodle-plugin-ci savepoints
+  - moodle-plugin-ci mustache
+  - moodle-plugin-ci phpdoc
+  - moodle-plugin-ci phpunit
+  - moodle-plugin-ci behat
+  - moodle-plugin-ci grunt
