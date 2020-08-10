@@ -136,6 +136,13 @@ class block_lord extends block_base {
             array('href' => new moodle_url('/blocks/lord/custom_settings.php', array(
                 'id' => $COURSE->id
             ))));
+        $this->content->text .= html_writer::empty_tag('br');
+
+        // Link for documentation page.
+        $this->content->text .= html_writer::tag('a', get_string("documentation", "block_lord"),
+            array('href' => new moodle_url('/blocks/lord/documentation.php', array(
+                'id' => $COURSE->id
+            ))));
 
         return $this->content;
     }
