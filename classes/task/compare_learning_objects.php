@@ -42,7 +42,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
      * Debugging flag.
      * @var boolean $dodebug
      */
-    private static $dodebug = true;
+    private static $dodebug = false;
 
     /**
      * Function to print out a debugging message or other variable.

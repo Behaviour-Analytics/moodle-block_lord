@@ -39,7 +39,7 @@ require_capability('block/lord:view', $context);
 // Set up the page.
 $PAGE->set_url('/blocks/lord/custom_settings.php', array('id' => $course->id));
 $PAGE->set_title(get_string('pluginname', 'block_lord'));
-$PAGE->set_pagelayout('popup');
+$PAGE->set_pagelayout('standard');
 $PAGE->set_heading($course->fullname);
 
 // The options form.

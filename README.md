@@ -7,8 +7,8 @@ This plugin extracts all the text content from the various learning objects in
 a course and uses that content to determine a similarity measure between each
 activity and every other activity. The similarity value comes from a Web service
 that takes 2 sentences and compares them, returning a similarity measure, which
-is then used as a link weight between the activity nodes in a network graph. The
-different weights combined with the graphing physics simulation produce a unique
+is then used as a link distance between the activity nodes in a network graph. The
+different distances combined with the graphing physics simulation produce a unique
 configuration of nodes. This plugin acts as a stand alone program, but is
 designed to be used with the Behaviour Analytics block, where the nodes in the
 graph are manually configured. This program is designed to replace the manual
@@ -36,7 +36,16 @@ lengthy process. Once all activity connections have been compared, the graph can
 be viewed by clicking the associated link. If there are missing values, the graph
 does not configure properly. If you are happy with the automatically configured
 graph, there is a button beneath the graph to save the configuration to the
-database.
+database. Clicking and dragging the graph nodes will also rearrange their
+configuration.
+
+When viewing the graph, left-clicking a node will show the learning content for
+the associated learning object. Right-clicking another node will show the content
+for both nodes as well as the similarity value between them. Beneath the
+similarity value and content are a number of matrices showing the similarity
+values between words in the sentences, sentences in the paragraphs, and
+paragraphs in the content. All these similarities combine to form the final
+similarity value.
 
 There is a settings page that contains various options for the plugin. The first
 is a checkbox to start or resume the discovery process. No comparisons between
