@@ -384,7 +384,7 @@ function block_lord_get_node_coords(&$course) {
             'visible' => $sc->visible
         );
     }
-    
+
     // Get the user generated graph node coordinates.
     $usercoords = [];
     if ($usergraph) {

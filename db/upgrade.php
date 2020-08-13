@@ -144,6 +144,10 @@ function xmldb_block_lord_upgrade($oldversion) {
 
     if ($oldversion < 2020081100) {
 
+        // Remove all data from the scales table before adding fields to avoid errors.
+        $DB->delete_records_select('block_lord_scales', 'id > :minid', ['minid' => 0]);
+        $DB->delete_records_select('block_lord_coords', 'id > :minid', ['minid' => 0]);
+
         // Define field userid to be dropped from block_lord_coords.
         $table = new xmldb_table('block_lord_coords');
         $field = new xmldb_field('userid');
@@ -162,7 +166,6 @@ function xmldb_block_lord_upgrade($oldversion) {
             $dbman->drop_field($table, $field);
         }
 
-
         // Define field iscustom to be added to block_lord_scales.
         $table = new xmldb_table('block_lord_scales');
         $field = new xmldb_field('iscustom', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, 'scale');
@@ -177,6 +180,10 @@ function xmldb_block_lord_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020081200) {
+
+        // Remove all data from the scales table before adding fields to avoid errors.
+        $DB->delete_records_select('block_lord_scales', 'id > :minid', ['minid' => 0]);
+        $DB->delete_records_select('block_lord_coords', 'id > :minid', ['minid' => 0]);
 
         // Define field mindist to be added to block_lord_scales.
         $table = new xmldb_table('block_lord_scales');
@@ -204,7 +211,6 @@ function xmldb_block_lord_upgrade($oldversion) {
         // Lord savepoint reached.
         upgrade_block_savepoint(true, 2020081200, 'lord');
     }
-
 
     return true;
 }
