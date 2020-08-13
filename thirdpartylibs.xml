@@ -7,4 +7,11 @@
         <license>Apache License</license>
         <licenseversion>2.0</licenseversion>
     </library>
+    <library>
+        <location>javascript/d3/</location>
+        <name>D3</name>
+        <version>5.8.2</version>
+        <license>BSD 3-Clause "New" or "Revised" License</license>
+        <licenseversion>3.0</licenseversion>
+    </library>
 </libraries>
