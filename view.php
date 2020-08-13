@@ -52,6 +52,7 @@ $out['comparisonweights'] = block_lord_get_comparison_weights($course);
 $out['names'] = $names;
 $out['paragraphs'] = $paragraphs;
 $out['sentences'] = $sentences;
+$out['presetnodes'] = block_lord_get_node_coords($course);
 
 // Set up the page.
 $PAGE->set_url('/blocks/lord/view.php', array('id' => $course->id));
@@ -62,7 +63,12 @@ $PAGE->requires->js_call_amd('block_lord/modules', 'init');
 $PAGE->requires->js_init_call('waitForModules', array($out), true);
 $PAGE->requires->js('/blocks/lord/javascript/main.js');
 
-$PAGE->requires->string_for_js('savebutton', 'block_lord');
+$PAGE->requires->string_for_js('custombutton', 'block_lord');
+$PAGE->requires->string_for_js('systembutton', 'block_lord');
+$PAGE->requires->string_for_js('resetbutton', 'block_lord');
+$PAGE->requires->string_for_js('graphsaved', 'block_lord');
+$PAGE->requires->string_for_js('systemgraph', 'block_lord');
+$PAGE->requires->string_for_js('usergraph', 'block_lord');
 $PAGE->requires->string_for_js('similaritystr', 'block_lord');
 $PAGE->requires->string_for_js('comparisonerror', 'block_lord');
 $PAGE->requires->string_for_js('notcalculated', 'block_lord');

@@ -335,6 +335,88 @@ function block_lord_get_comparison_weights(&$course) {
 }
 
 /**
+ * Called to get the graph node coordinates from the database. This function
+ * will pull the coordinates for both the system generated graph and the
+ * user generated graph.
+ *
+ * @param stdClass $course The course object.
+ * @return array
+ */
+function block_lord_get_node_coords(&$course) {
+    global $DB;
+
+    // Get the data for the last graph configurations.
+    $params = array(
+        'courseid1' => $course->id,
+        'courseid2' => $course->id,
+        'iscustom' => 0
+    );
+    $query = "SELECT * FROM {block_lord_scales}
+               WHERE courseid = :courseid1
+                 AND coordsid = (SELECT max(coordsid) FROM {block_lord_scales}
+                                  WHERE courseid = :courseid2
+                                    AND iscustom = :iscustom)";
+    $systemgraph = $DB->get_record_sql($query, $params);
+
+    // Might not be any graphs generated yet.
+    if (!$systemgraph) {
+        return array(
+            'systemgraph' => [],
+            'usergraph' => []
+        );
+    }
+
+    $params['iscustom'] = 1;
+    $usergraph = $DB->get_record_sql($query, $params);
+
+    // Get the system generated graph node coordinates.
+    $params = array(
+        'courseid' => $course->id,
+        'changed' => $systemgraph->coordsid
+    );
+    $systemcoords = $DB->get_records('block_lord_coords', $params);
+
+    $systemnodes = [];
+    foreach ($systemcoords as $sc) {
+        $systemnodes[$sc->moduleid] = array(
+            'xcoord'  => $sc->xcoord,
+            'ycoord'  => $sc->ycoord,
+            'visible' => $sc->visible
+        );
+    }
+    
+    // Get the user generated graph node coordinates.
+    $usercoords = [];
+    if ($usergraph) {
+        $params['changed'] = $usergraph->coordsid;
+        $usercoords = $DB->get_records('block_lord_coords', $params);
+    }
+
+    $usernodes = [];
+    foreach ($usercoords as $uc) {
+        $usernodes[$uc->moduleid] = array(
+            'xcoord'  => $uc->xcoord,
+            'ycoord'  => $uc->ycoord,
+            'visible' => $uc->visible
+        );
+    }
+
+    // Return the necessary data.
+    return array(
+        'systemgraph' => $systemnodes,
+        'systemscale' => $systemgraph->scale,
+        'systemmindist' => $systemgraph->mindist,
+        'systemmaxdist' => $systemgraph->maxdist,
+        'systemdistscale' => $systemgraph->distscale,
+        'usergraph' => $usernodes,
+        'userscale' => $usergraph->scale,
+        'usermindist' => $usergraph->mindist,
+        'usermaxdist' => $usergraph->maxdist,
+        'userdistscale' => $usergraph->distscale,
+    );
+}
+
+/**
  * Form definition for the custom settings and reset options.
  *
  * @author Ted Krahn

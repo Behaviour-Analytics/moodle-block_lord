@@ -38,42 +38,35 @@ require_login($course);
 $context = context_course::instance($courseid);
 require_capability('block/lord:view', $context);
 
-$userid = $USER->id;
 $nodes = json_decode($nodedata);
 
 // Build new records.
 $data = [];
 $nds = [];
-$scale = 1.0;
 $coordsid = $nodes->time;
 
-foreach ($nodes as $key => $value) {
+foreach ($nodes->nodes as $key => $value) {
 
-    // Parse out non-coordinate related data.
-    if ($key == 'scale') {
-        $scale = $value;
-    } else if ($key == 'time') {
-        continue;
-    } else {
-        $data[] = (object) array(
-            'courseid' => $courseid,
-            'userid'   => $USER->id,
-            'changed'  => $coordsid,
-            'moduleid' => $key,
-            'xcoord'   => $value->xcoord,
-            'ycoord'   => $value->ycoord,
-            'visible'  => 1
-        );
-    }
+    $data[] = (object) array(
+        'courseid' => $courseid,
+        'changed'  => $coordsid,
+        'moduleid' => $key,
+        'xcoord'   => $value->xcoord,
+        'ycoord'   => $value->ycoord,
+        'visible'  => 1
+    );
 }
 // Store new node coordinates.
 $DB->insert_records('block_lord_coords', $data);
 
 $DB->insert_record('block_lord_scales', (object) array(
-    'courseid' => $courseid,
-    'userid'   => $USER->id,
-    'coordsid' => $coordsid,
-    'scale'    => $scale
+    'courseid'  => $courseid,
+    'coordsid'  => $coordsid,
+    'scale'     => $nodes->scale,
+    'iscustom'  => $nodes->iscustom,
+    'mindist'   => $nodes->mindist,
+    'maxdist'   => $nodes->maxdist,
+    'distscale' => $nodes->distscale,
 ));
 
 die('Graph configuration saved.');

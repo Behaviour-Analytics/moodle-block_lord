@@ -142,5 +142,69 @@ function xmldb_block_lord_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2020080603, 'lord');
     }
 
+    if ($oldversion < 2020081100) {
+
+        // Define field userid to be dropped from block_lord_coords.
+        $table = new xmldb_table('block_lord_coords');
+        $field = new xmldb_field('userid');
+
+        // Conditionally launch drop field moduleid.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Define field userid to be dropped from block_lord_scales.
+        $table = new xmldb_table('block_lord_scales');
+        $field = new xmldb_field('userid');
+
+        // Conditionally launch drop field userid.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+
+        // Define field iscustom to be added to block_lord_scales.
+        $table = new xmldb_table('block_lord_scales');
+        $field = new xmldb_field('iscustom', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, 'scale');
+
+        // Conditionally launch add field iscustom.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Lord savepoint reached.
+        upgrade_block_savepoint(true, 2020081100, 'lord');
+    }
+
+    if ($oldversion < 2020081200) {
+
+        // Define field mindist to be added to block_lord_scales.
+        $table = new xmldb_table('block_lord_scales');
+        $field = new xmldb_field('mindist', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null, 'iscustom');
+
+        // Conditionally launch add field mindist.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('maxdist', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null, 'mindist');
+
+        // Conditionally launch add field mindist.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('distscale', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, null, 'maxdist');
+
+        // Conditionally launch add field mindist.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Lord savepoint reached.
+        upgrade_block_savepoint(true, 2020081200, 'lord');
+    }
+
+
     return true;
 }
