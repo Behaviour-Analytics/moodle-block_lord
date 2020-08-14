@@ -463,10 +463,12 @@ class block_lord_reset_form extends moodleform {
 
         $options = array('yes' => get_string('yes'), 'no' => get_string('no'));
 
-        // Option to start/resume discovery process.
-        $mform->addElement('advcheckbox', 'start_discovery', get_string('startdiscovery', 'block_lord'),
-            get_string('startdiscoverylabel', 'block_lord'));
-        $mform->setDefault('start_discovery', $started);
+        // Option to start/resume discovery process. Only available if turned on globally.
+        if (get_config('block_lord', 'start')) {
+            $mform->addElement('advcheckbox', 'start_discovery', get_string('startdiscovery', 'block_lord'),
+                get_string('startdiscoverylabel', 'block_lord'));
+            $mform->setDefault('start_discovery', $started);
+        }
 
         // Text entry box for maximum number of paragraphs.
         $mform->addElement('text', 'num_paras', get_string('numparas', 'block_lord'));
