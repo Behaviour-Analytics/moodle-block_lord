@@ -212,5 +212,33 @@ function xmldb_block_lord_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2020081200, 'lord');
     }
 
+    if ($oldversion < 2020090201) {
+
+        // Remove all data from the other tables to avoid errors.
+        $DB->delete_records_select('block_lord_scales', 'id > :minid', ['minid' => 0]);
+        $DB->delete_records_select('block_lord_coords', 'id > :minid', ['minid' => 0]);
+
+        // Define block_lord_links table.
+        $table = new xmldb_table('block_lord_links');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('coordsid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('module1', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('module2', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('weight', XMLDB_TYPE_NUMBER, '20,10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table block_lord_links.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for block_lord_links.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Behaviour savepoint reached.
+        upgrade_block_savepoint(true, 2020090201, 'lord');
+    }
+
     return true;
 }

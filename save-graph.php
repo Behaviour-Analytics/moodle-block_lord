@@ -69,5 +69,32 @@ $DB->insert_record('block_lord_scales', (object) array(
     'distscale' => $nodes->distscale,
 ));
 
+// Insert the link weights into the DB.
+$data = [];
+foreach ($nodes->links as $link) {
+
+    if (!is_numeric($link->source->id) || !is_numeric($link->target->id)) {
+        continue;
+    }
+
+    $m1 = $link->source->id;
+    $m2 = $link->target->id;
+
+    if ($m1 > $m2) {
+        $m1 = $link->target->id;
+        $m2 = $link->source->id;
+    }
+
+    $data[] = (object) array(
+        'courseid' => $courseid,
+        'coordsid' => $coordsid,
+        'module1'  => $m1,
+        'module2'  => $m2,
+        'weight'   => $link->weight
+    );
+}
+// Store new links.
+$DB->insert_records('block_lord_links', $data);
+
 die('Graph configuration saved.');
 

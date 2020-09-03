@@ -98,7 +98,6 @@ class provider implements
             'block_lord_coords',
             [
                 'courseid' => 'privacy:metadata:block_lord:courseid',
-                'userid'   => 'privacy:metadata:block_lord:userid',
                 'changed'  => 'privacy:metadata:block_lord:changed',
                 'moduleid' => 'privacy:metadata:block_lord:moduleid',
                 'xcoord'   => 'privacy:metadata:block_lord:xcoord',
@@ -111,10 +110,13 @@ class provider implements
         $collection->add_database_table(
             'block_lord_scales',
             [
-                'courseid' => 'privacy:metadata:block_lord:courseid',
-                'userid'   => 'privacy:metadata:block_lord:userid',
-                'coordsid' => 'privacy:metadata:block_lord:coordsid',
-                'scale'    => 'privacy:metadata:block_lord:scale',
+                'courseid'  => 'privacy:metadata:block_lord:courseid',
+                'coordsid'  => 'privacy:metadata:block_lord:coordsid',
+                'scale'     => 'privacy:metadata:block_lord:scale',
+                'iscustom'  => 'privacy:metadata:block_lord:iscustom',
+                'mindist'   => 'privacy:metadata:block_lord:mindist',
+                'maxdist'   => 'privacy:metadata:block_lord:maxdist',
+                'distscale' => 'privacy:metadata:block_lord:distscale',
             ],
             'privacy:metadata:block_lord_scales'
         );
@@ -137,6 +139,18 @@ class provider implements
                 'status' => 'privacy:metadata:block_lord:status',
             ],
             'privacy:metadata:block_lord_dictionary'
+        );
+
+        $collection->add_database_table(
+            'block_lord_links',
+            [
+                'courseid' => 'privacy:metadata:block_lord:courseid',
+                'coordsid' => 'privacy:metadata:block_lord:coordsid',
+                'module1'  => 'privacy:metadata:block_lord:module1',
+                'module2'  => 'privacy:metadata:block_lord:module2',
+                'weight'   => 'privacy:metadata:block_lord:weight',
+            ],
+            'privacy:metadata:block_lord_links'
         );
 
         return $collection;
@@ -175,20 +189,8 @@ class provider implements
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
     public static function get_users_in_context(userlist $userlist) {
-
-        $context = $userlist->get_context();
-
-        if (!$context instanceof \context_course) {
-            return;
-        }
-
-        $params = ['contextid' => $context->id];
-
-        $sql = "SELECT distinct(userid)
-                  FROM {block_lord_coords}
-              ORDER BY userid";
-
-        $userlist->add_from_sql('userid', $sql, $params);
+        // No userid value in any tables for block_lord, no users.
+        return;
     }
 
     /**
@@ -197,39 +199,8 @@ class provider implements
      * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
     public static function export_user_data(approved_contextlist $contextlist) {
-        global $DB;
-
-        // If the user has block_lord data, then only the Course context should be present.
-        $contexts = $contextlist->get_contexts();
-        if (count($contexts) == 0) {
-            return;
-        }
-
-        $seen = [];
-
-        // Export data for each user.
-        foreach ($contexts as $context) {
-
-            // Sanity check that context is at the Course context level.
-            if ($context->contextlevel !== CONTEXT_COURSE) {
-                return;
-            }
-
-            // Don't process a user id more than once.
-            if (isset($seen[$context->instanceid])) {
-                continue;
-            }
-
-            $seen[$context->instanceid] = 1;
-            $params = ['userid' => $context->instanceid];
-
-            // The block_lord data export, all tables with this userid.
-            $data = (object) $DB->get_records('block_lord_coords', $params);
-            writer::with_context($context)->export_data([], $data);
-
-            $data = (object) $DB->get_records('block_lord_scales', $params);
-            writer::with_context($context)->export_data([], $data);
-        }
+        // No userid value in any tables for block_lord, no user data to export.
+        return;
     }
 
     /**
@@ -238,18 +209,8 @@ class provider implements
      * @param context $context The specific context to delete data for.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        global $DB;
-
-        // Sanity check that context is at the Course context level.
-        if ($context->contextlevel !== CONTEXT_COURSE) {
-            return;
-        }
-
-        $params = ['idvalue' => 0];
-        $cond = 'id > :idvalue';
-
-        $DB->delete_records_select('block_lord_coords', $cond, $params);
-        $DB->delete_records_select('block_lord_scales', $cond, $params);
+        // No userid value in any tables for block_lord, no user data to delete.
+        return;
     }
 
     /**
@@ -258,24 +219,8 @@ class provider implements
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        global $DB;
-
-        // If the user has block_lord data, then only the Course context should be present.
-        $contexts = $contextlist->get_contexts();
-        if (count($contexts) == 0) {
-            return;
-        }
-        $context = reset($contexts);
-
-        // Sanity check that context is at the Course context level.
-        if ($context->contextlevel !== CONTEXT_COURSE) {
-            return;
-        }
-
-        $params = ['userid' => $context->instanceid];
-
-        $DB->delete_records('block_lord_coords', $params);
-        $DB->delete_records('block_lord_scales', $params);
+        // No userid value in any tables for block_lord, no user data to delete.
+        return;
     }
 
     /**
@@ -284,19 +229,7 @@ class provider implements
      * @param approved_userlist $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        global $DB;
-
-        $context = $userlist->get_context();
-        if (!$context instanceof \context_course) {
-            return;
-        }
-
-        foreach ($userlist->get_userids() as $userid) {
-
-            $params = ['userid' => $userid];
-
-            $DB->delete_records('block_lord_coords', $params);
-            $DB->delete_records('block_lord_scales', $params);
-        }
+        // No userid value in any tables for block_lord, no user data to delete.
+        return;
     }
 }

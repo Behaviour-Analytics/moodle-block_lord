@@ -1,3 +1,30 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * This file defines the client side logic for the LORD plugin, which includes
+ * rendering the graph and related interface, calculating the final similarity
+ * weights between nodes, showing the node content and similarity matrices, and
+ * sending the node and link data back to the server for storage.
+ *
+ * @package block_lord
+ * @author Ted Krahn
+ * @copyright 2020 Athabasca University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 (function(factory) {
     if (typeof define === "function" && define.amd) {
         // AMD. Register as an anonymous module.
@@ -1558,6 +1585,7 @@
 
             // Store distance and node that was used.
             normalized.scale = max;
+            normalized.links = graphData.links;
             normalized.nodes = {};
 
             // Normalize all nodes based on greatest distance.
