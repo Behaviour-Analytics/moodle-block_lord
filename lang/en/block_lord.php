@@ -83,6 +83,7 @@ $string['startlabel'] = 'Start the relation discovery process?';
 $string['startdesc'] = 'Start the learning object relation discovery process.';
 $string['startdiscovery'] = 'Start or resume the learning object relation discovery process?';
 $string['startdiscoverylabel'] = 'Checked box will start or resume the relation discovery process.';
+$string['debugcomparisons'] = 'Debug comparison errors';
 $string['documentation'] = 'Documentation';
 $string['stopwords'] = 'a about an are as at be by com de en for from how i in is it la of on or that the this to und was what when where who will with www';
 $string['privacy:metadata:block_lord_comparisons'] = 'Table to store learning object comparison data.';

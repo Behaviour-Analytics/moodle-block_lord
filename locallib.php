@@ -124,6 +124,10 @@ function block_lord_get_progress(&$course) {
 
     foreach ($records as $record) {
 
+        if ($record->value != '' && $record->value == 0.0) {
+            $errors++;
+        }
+
         $key = $record->module1 . '_' . $record->module2;
 
         if (isset($comparisons[$key])) {
@@ -133,10 +137,6 @@ function block_lord_get_progress(&$course) {
 
         if ($record->value) {
             $calculated++;
-        }
-
-        if ($record->value != '' && $record->value == 0.0) {
-            $errors++;
         }
     }
 
@@ -515,10 +515,14 @@ class block_lord_reset_form extends moodleform {
         $mform->addElement('header', 'config_header', get_string('resetheader2', 'block_lord'));
 
         // Yes/No select option for resetting comparison errors.
+        $mform->addElement('select', 'reset_errors', get_string('reseterrors', 'block_lord'), $options);
+        $mform->getElement('reset_errors')->setSelected('no');
+
+        // Yes/No select option for resetting all comparisons.
         $mform->addElement('select', 'reset_comparisons', get_string('resetcomparisons', 'block_lord'), $options);
         $mform->getElement('reset_comparisons')->setSelected('no');
 
-        // Yes/No select option for resetting comparison errors.
+        // Yes/No select option for resetting all content and comparisons.
         $mform->addElement('select', 'reset_content', get_string('resetcontent', 'block_lord'), $options);
         $mform->getElement('reset_content')->setSelected('no');
 

@@ -42,7 +42,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
      * Debugging flag.
      * @var boolean $dodebug
      */
-    private static $dodebug = false;
+    private static $dodebug = true;
 
     /**
      * Function to print out a debugging message or other variable.
@@ -932,9 +932,9 @@ class compare_learning_objects extends \core\task\scheduled_task {
      */
     private function call_bridge(&$key, &$target) {
 
-        // Sanity check.
+        // Sanity check. Return non-zero value to avoid persistent errors.
         if (strlen($key) == 0 || strlen($target) == 0) {
-            return [0.0, ''];
+            return [-0.000001, ''];
         }
 
         // The outgoing JSON data.

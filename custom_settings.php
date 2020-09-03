@@ -80,6 +80,15 @@ if ($mform->is_cancelled()) {
         $DB->insert_record('block_lord_max_words', $params);
     }
 
+    // Reset comparison errors.
+    if ($fromform->reset_errors == 'yes') {
+        $params = array(
+            'courseid' => $course->id,
+            'value' => 0.0
+        );
+        $DB->delete_records('block_lord_comparisons', $params);
+    }
+
     // Reset all comparisons.
     if ($fromform->reset_comparisons == 'yes') {
         $DB->delete_records('block_lord_comparisons', ['courseid' => $course->id]);
