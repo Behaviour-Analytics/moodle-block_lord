@@ -23,8 +23,11 @@ learning activities in the course. The frequency of the comparisons can be
 adjusted by from Site administration -> Server -> Scheduled tasks. By default,
 the task is set to run every 5 minutes and will make a single comparison between
 learning activities for each course that the plugin is installed in. No
-comparisons will be made, however, until the discovery process is turned on
-globally and in the course which has the block installed.
+comparisons will be made, however, until the discovery process is turned on both
+globally and locally in the course in which the block is installed. To turn on
+the discovery process globally, navigate to Site administration -> Plugins ->
+Plugins overview -> Settings (for LORD). The discovery process can be turned on
+locally from the Settings link in the block.
 
 
 ## How to use the plugin ##
@@ -32,12 +35,20 @@ globally and in the course which has the block installed.
 This plugin is simple to use. The block shown on the course page contains a link
 to the graphing page, a progress chart, and a link to settings. The progress
 chart will show how many activity connections have been compared, which is a
-lengthy process. Once all activity connections have been compared, the graph can
+lengthy process. The Web service takes time to compare the content from the
+different activities, so the process is run in the background. Depending on the
+number of learning activities in the course and the frequency of the scheduled
+task, the process could take from hours to weeks. The progress chart will show
+what has been done to date.
+
+Once all activity connections have been compared, the graph can
 be viewed by clicking the associated link. If there are missing values, the graph
-does not configure properly. If you are happy with the automatically configured
-graph, there is a button beneath the graph to save the configuration to the
-database. Clicking and dragging the graph nodes will also rearrange their
-configuration.
+does not configure properly. The first time the graphing page is viewed, a new
+graph is generated, which is the system graph. Clicking and dragging the graph
+nodes will also rearrange the configuration and produce a custom graph. The
+graphing interface has a button to switch between the custom and system graphs.
+There are also 3 sliders that control the distance parameters for graph
+generation and another button to regenerate the system graph.
 
 When viewing the graph, left-clicking a node will show the learning content for
 the associated learning object. Right-clicking another node will show the content
@@ -54,15 +65,10 @@ are also options to control the maximum number of sentences and paragraphs
 compared between learning objects and the maximum number of words to allow in a
 sentence. There are also adjustable weights for use in the final similarity value
 calculation, where the names, the introductions, and the rest of the module
-content can be weighted differently. There are 2 reset options, one to reset just
-the comparisons and the other to reset comparisons and module content. Finally,
-there is an option to add or remove stop words from the dictionary.
-
-The Web service takes time to compare the content from the different activities,
-so the process is run in the background. Depending on the number of learning
-activities in the course and the frequency of the scheduled task, the process
-could take from hours to weeks. The progress chart will show what has been done
-to date.
+content can be weighted differently. There are 3 reset options, one to reset just
+the comparison errors, one to reset all comparisons, and the other to reset both
+comparisons and module content. Finally, there is an option to add or remove stop
+words from the dictionary.
 
 
 ## License ##

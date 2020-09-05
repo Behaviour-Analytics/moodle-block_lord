@@ -85,6 +85,7 @@ $PAGE->requires->string_for_js('introscost', 'block_lord');
 $PAGE->requires->string_for_js('intros', 'block_lord');
 $PAGE->requires->string_for_js('parascost', 'block_lord');
 $PAGE->requires->string_for_js('sentscost', 'block_lord');
+$PAGE->requires->string_for_js('runphysics', 'block_lord');
 
 // Finish setting up page.
 $PAGE->set_pagelayout('standard');

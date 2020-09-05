@@ -93,6 +93,8 @@ echo html_writer::div(get_string('docs:settings:desc3', 'block_lord'));
 echo html_writer::empty_tag('br');
 echo html_writer::div(get_string('docs:settings:desc4', 'block_lord'));
 echo html_writer::empty_tag('br');
+echo html_writer::div(get_string('docs:settings:desc5', 'block_lord'));
+echo html_writer::empty_tag('br');
 echo html_writer::empty_tag('br');
 
 echo $OUTPUT->footer();

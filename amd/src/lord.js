@@ -71,7 +71,8 @@
             coordsScale, // Scale value for graph.
             usingCustomGraph, // Flag to determine which graph is rendered.
             simulationTimeout, // Time in milliseconds physics simulation will run.
-            distanceScales; // Array of graphing interface slider values.
+            distanceScales, // Array of graphing interface slider values.
+            physicsIsRunning; // Flag to turn on/off the physics simulation.
 
         /**
          * Initialize the program. This function sets various default values and
@@ -668,101 +669,137 @@
          */
         function addGraphInterface() {
 
-            var saveGraph = document.getElementById('save-graph');
+            var intrface = document.getElementById('save-graph');
 
             // The revert graph button.
-            var revertButton = document.createElement('input');
-            revertButton.id = 'revert-button';
-            revertButton.type = 'button';
-            revertButton.value = M.util.get_string('systembutton', 'block_lord');
-            revertButton.addEventListener('click', revertGraph);
-            revertButton.style.marginRight = '20px';
-
-            saveGraph.appendChild(revertButton);
+            addButton('revert-button', M.util.get_string('systembutton', 'block_lord'),
+                      revertGraph, intrface);
 
             // The minimum distance slider.
-            var minDistSlider = document.createElement('input');
-            minDistSlider.id = 'min-dist-slider';
-            minDistSlider.type = 'range';
-            minDistSlider.min = '10';
-            minDistSlider.max = '50';
-            minDistSlider.step = '5';
-            minDistSlider.value = minNodeDist;
-            minDistSlider.style.width = '100px';
+            var div = document.createElement('div');
+            var minDistSlider = addSlider('min-dist-slider', 10, 50, 5, minNodeDist);
             minDistSlider.addEventListener('change', function() {
                 minNodeDist = this.value;
                 document.getElementById('min-dist-output').innerHTML = '&nbsp;= ' + this.value;
             });
-            saveGraph.appendChild(minDistSlider);
+            div.appendChild(minDistSlider);
 
-            // The label for the slider.
-            var text = document.createTextNode(M.util.get_string('mindistance', 'block_lord'));
-            saveGraph.appendChild(text);
-
-            text = document.createElement('label');
-            text.id = 'min-dist-output';
-            text.innerHTML = '&nbsp;= ' + minDistSlider.value;
-            text.style.marginRight = '20px';
-            saveGraph.appendChild(text);
+            addLabel(M.util.get_string('mindistance', 'block_lord'),
+                     'min-dist-output', minDistSlider.value, div);
+            intrface.appendChild(div);
 
             // The maximum distance slider.
-            var maxDistSlider = document.createElement('input');
-            maxDistSlider.id = 'max-dist-slider';
-            maxDistSlider.type = 'range';
-            maxDistSlider.min = '50';
-            maxDistSlider.max = '500';
-            maxDistSlider.step = '25';
-            maxDistSlider.value = maxNodeDist;
-            maxDistSlider.style.width = '100px';
+            div = document.createElement('div');
+            var maxDistSlider = addSlider('max-dist-slider', 50, 500, 25, maxNodeDist);
             maxDistSlider.addEventListener('change', function() {
                 maxNodeDist = this.value;
                 document.getElementById('max-dist-output').innerHTML = '&nbsp;= ' + this.value;
             });
-            saveGraph.appendChild(maxDistSlider);
+            div.appendChild(maxDistSlider);
 
-            // The label for the slider.
-            text = document.createTextNode(M.util.get_string('maxdistance', 'block_lord'));
-            saveGraph.appendChild(text);
+            addLabel(M.util.get_string('maxdistance', 'block_lord'),
+                     'max-dist-output', maxDistSlider.value, div);
+            intrface.appendChild(div);
 
-            text = document.createElement('label');
-            text.id = 'max-dist-output';
-            text.innerHTML = '&nbsp;= ' + maxDistSlider.value;
-            text.style.marginRight = '20px';
-            saveGraph.appendChild(text);
-
-            // The maximum distance slider.
-            var scaleSlider = document.createElement('input');
-            scaleSlider.id = 'scale-slider';
-            scaleSlider.type = 'range';
-            scaleSlider.min = '0';
-            scaleSlider.max = '2000';
-            scaleSlider.step = '100';
-            scaleSlider.value = nodeDistScale;
-            scaleSlider.style.width = '100px';
+            // The scale factor slider.
+            div = document.createElement('div');
+            var scaleSlider = addSlider('scale-slider', 0, 2000, 100, nodeDistScale);
             scaleSlider.addEventListener('change', function() {
                 nodeDistScale = this.value;
                 document.getElementById('scale-output').innerHTML = '&nbsp;= ' + this.value;
             });
-            saveGraph.appendChild(scaleSlider);
+            div.appendChild(scaleSlider);
 
-            // The label for the slider.
-            text = document.createTextNode(M.util.get_string('scalingfactor', 'block_lord'));
-            saveGraph.appendChild(text);
-
-            text = document.createElement('label');
-            text.id = 'scale-output';
-            text.innerHTML = '&nbsp;= ' + scaleSlider.value;
-            text.style.marginRight = '20px';
-            saveGraph.appendChild(text);
+            addLabel(M.util.get_string('scalingfactor', 'block_lord'),
+                     'scale-output', scaleSlider.value, div);
+            intrface.appendChild(div);
 
             // The reset graph button.
-            var resetButton = document.createElement('input');
-            resetButton.type = 'button';
-            resetButton.value = M.util.get_string('resetbutton', 'block_lord');
-            resetButton.addEventListener('click', resetGraph);
-            resetButton.style.marginRight = '20px';
+            addButton('reset-button', M.util.get_string('resetbutton', 'block_lord'),
+                      resetGraph, intrface);
 
-            saveGraph.appendChild(resetButton);
+            // The allow changes checkbox.
+            physicsIsRunning = true;
+            div = document.createElement('div');
+            var physicsBox = document.createElement('input');
+            physicsBox.type = 'checkbox';
+            physicsBox.checked = 1;
+            physicsBox.addEventListener('click', function() {
+                physicsIsRunning = !physicsIsRunning;
+            });
+            physicsBox.style.marginRight = '5px';
+            div.appendChild(physicsBox);
+
+            addLabel(M.util.get_string('runphysics', 'block_lord'), 'run-physics', '', div);
+            intrface.appendChild(div);
+        }
+
+        /**
+         * Function to add a button to the graphing interface.
+         *
+         * @param {string} id - The id for the button
+         * @param {string} name - The label for the button
+         * @param {function} listener - The click event listener
+         * @param {HTMLElement} parent - The parent DOM object to append to
+         */
+        function addButton(id, name, listener, parent) {
+
+            var button = document.createElement('input');
+            button.id = id;
+            button.type = 'button';
+            button.value = name;
+            button.addEventListener('click', listener);
+            button.style.marginRight = '20px';
+            button.style.float = 'left';
+
+            parent.appendChild(button);
+        }
+
+        /**
+         * Function to add a slider to the graphing interface.
+         *
+         * @param {string} id - The id for the label
+         * @param {number} min - The minimum value of the slider
+         * @param {number} max - The maximum value of the slider
+         * @param {number} step - The step value of the slider
+         * @param {number} value - The current value of the slider
+         * @return {HTMLElement}
+         */
+        function addSlider(id, min, max, step, value) {
+
+            var slider = document.createElement('input');
+            slider.id = id;
+            slider.type = 'range';
+            slider.min = min;
+            slider.max = max;
+            slider.step = step;
+            slider.value = value;
+            slider.style.width = '100px';
+
+            return slider;
+        }
+
+        /**
+         * Function to add text to the graphing interface sliders.
+         *
+         * @param {string} name - The name for the slider
+         * @param {string} id - The id for the label
+         * @param {number} value - The value of the slider
+         * @param {HTMLElement} parent - The parent DOM object to append to
+         */
+        function addLabel(name, id, value, parent) {
+
+            // The label for the slider.
+            var text = document.createTextNode(name);
+            parent.appendChild(text);
+
+            text = document.createElement('label');
+            text.id = id;
+            text.innerHTML = value == '' ? '' : '&nbsp;= ' + value;
+            text.style.marginRight = '20px';
+
+            parent.appendChild(text);
+            parent.style.float = 'left';
         }
 
         /**
@@ -825,6 +862,10 @@
          * Function to regenerate the system graph.
          */
         function resetGraph() {
+
+            if (!physicsIsRunning) {
+                return;
+            }
 
             getData({});
             initGraph(tick, false);
@@ -1120,7 +1161,12 @@
             // Restart simulation if there is no event.
             if (!ddd.event.active) {
                 simulation.on('tick', tick);
-                simulation.alphaTarget(0.01).restart();
+
+                if (physicsIsRunning) {
+                    simulation.alphaTarget(0.01).restart();
+                } else {
+                    simulation.stop();
+                }
             }
 
             node.fx = node.x;
@@ -1150,9 +1196,12 @@
 
             // Save graph coordinates and show saved graph message.
             usingCustomGraph = true;
-            sendCoordsToServer(true);
-            document.getElementById('revert-button').value = M.util.get_string('systembutton', 'block_lord');
-            showGraphMessage('graphsaved');
+
+            if (physicsIsRunning) {
+                sendCoordsToServer(true);
+                document.getElementById('revert-button').value = M.util.get_string('systembutton', 'block_lord');
+                showGraphMessage('graphsaved');
+            }
         }
 
         /**
