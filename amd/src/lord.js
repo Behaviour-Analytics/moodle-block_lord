@@ -1318,6 +1318,10 @@
                 return;
             }
 
+            // Clear any old similarity data.
+            var sm = document.getElementById('similarity-matrix');
+            sm.innerHTML = '&nbsp;';
+
             var s = document.getElementById('similarity-score');
             var key = parseInt(node1) < parseInt(node2) ? node1 + '_' + node2 : node2 + '_' + node1;
 
@@ -1330,7 +1334,7 @@
 
                 } else {
                     s.innerHTML = M.util.get_string('similaritystr', 'block_lord') + ' ' + weight;
-                    showSimilarityMatrix(key);
+                    showSimilarityMatrix(key, sm);
                 }
             } else {
                 s.innerHTML = M.util.get_string('notcalculated', 'block_lord');
@@ -1341,11 +1345,10 @@
          * Called to render the similarity matrix for 2 modules.
          *
          * @param {string} key - The key into the matrices array
+         * @param {HTMLElement} sm - The similarity matrix element
          */
-        function showSimilarityMatrix(key) {
+        function showSimilarityMatrix(key, sm) {
 
-            var sm = document.getElementById('similarity-matrix');
-            sm.innerHTML = '&nbsp;';
             var keys = key.split('_');
 
             // Sorting function for comparisons.
