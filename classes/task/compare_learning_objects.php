@@ -151,7 +151,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
             }
 
             // Get learning activity comparison records.
-            $records = $DB->get_records('block_lord_comparisons', ['courseid' => $course->id]);
+            $records = $DB->get_records('block_lord_comparisons', ['courseid' => $course->id], 'module1, module2, compared');
 
             // If the table has been reset, then reinitialize.
             if (count($records) == 0) {
@@ -178,7 +178,8 @@ class compare_learning_objects extends \core\task\scheduled_task {
             // All modules have been compared, but if max setences or paragraphs have
             // changed, then there may be more comparisons for a given module pair.
             if ($compared > 0 && $compared == $possible) {
-                $this->recheck_comparisons($course->id);
+                reset($records);
+                $this->recheck_comparisons($course->id, $records);
             }
 
             $this->check_for_new_modules($course);
@@ -192,6 +193,8 @@ class compare_learning_objects extends \core\task\scheduled_task {
      */
     private function check_for_new_modules(&$course) {
         global $DB;
+
+        self::dbug('Checking for new modules in course '.$course->id);
 
         // Get the current stored modules.
         $modules = $DB->get_records('block_lord_modules', ['courseid' => $course->id]);
@@ -323,36 +326,50 @@ class compare_learning_objects extends \core\task\scheduled_task {
      * to be made.
      *
      * @param int $courseid The course id.
+     * @param array $comparisons The comparison records
      */
-    private function recheck_comparisons($courseid) {
+    private function recheck_comparisons($courseid, &$comparisons) {
         global $DB;
 
+        self::dbug('Rechecking comparisons for course '.$courseid);
+
         // Build an array of all previous comparisons.
-        $records = $DB->get_records('block_lord_comparisons', ['courseid' => $courseid], 'module1, module2, compared');
         $compared = [];
 
-        foreach ($records as $record) {
+        foreach ($comparisons as $c) {
 
-            if (!isset($compared[$record->module1])) {
-                $compared[$record->module1] = [];
+            if (!isset($compared[$c->module1])) {
+                $compared[$c->module1] = [];
             }
-            if (!isset($compared[$record->module1][$record->module2])) {
-                $compared[$record->module1][$record->module2] = [];
+            if (!isset($compared[$c->module1][$c->module2])) {
+                $compared[$c->module1][$c->module2] = [];
             }
 
-            $compared[$record->module1][$record->module2][$record->compared] = 1;
+            $compared[$c->module1][$c->module2][$c->compared] = 1;
+        }
+
+        // Get the module names and intros.
+        $data = [];
+        $mods = $DB->get_records('block_lord_modules', ['courseid' => $courseid]);
+        foreach ($mods as $mod) {
+            $data[$mod->module] = array(
+                'name' => $mod->name,
+                'intro' => $mod->intro,
+                'paras' => []
+            );
+        }
+
+        // Get the module content data.
+        $paras = $DB->get_records('block_lord_paragraphs', ['courseid' => $courseid], 'module, paragraph');
+        foreach ($paras as $para) {
+            $data[$para->module]['paras'][$para->paragraph] = $para->content;
         }
 
         // Recheck the comparisons.
-        $params = array(
-            'courseid' => $courseid,
-            'compared' => 'name'
-        );
-        $records = $DB->get_records('block_lord_comparisons', $params, 'module1');
-
         $n = 0;
-        foreach ($records as $record) {
-            $didsome = $this->recheck_similarity($record, $compared);
+        unset($c);
+        foreach ($comparisons as $c) {
+            $didsome = $this->recheck_similarity($c, $compared, $data);
 
             if ($didsome) {
                 $n++;
@@ -369,38 +386,37 @@ class compare_learning_objects extends \core\task\scheduled_task {
      *
      * @param stdClass $record The comparison table record for the modules.
      * @param array $compared An array of module sentence values that have been compared.
+     * @param array $data The name, intro, and content data for the modules.
      * @return boolean
      */
-    private function recheck_similarity(&$record, &$compared) {
+    private function recheck_similarity(&$record, &$compared, &$data) {
         global $DB;
 
-        // Get the key text from the first module.
-        $params = array(
-            'courseid' => $record->courseid,
-            'module'   => $record->module1
-        );
-        $key = $DB->get_record('block_lord_modules', $params);
-        $kparas = $DB->get_records('block_lord_paragraphs', $params);
+        // Compare the names of the modules.
+        if (!isset($compared[$record->module1][$record->module2]['name'])) {
+            $compared[$record->module1][$record->module2]['name'] = 1;
+            self::dbug('Comparing names: '.$data[$record->module1]->name.' x '.$data[$record->module2]->name);
 
-        $keyparas = [];
-        foreach ($kparas as $para) {
-            $keyparas[] = $para->content;
-        }
-        unset($para);
+            $keyname = $this->clean_sentence($data[$record->module1]->name);
+            $targetname = $this->clean_sentence($data[$record->module2]->name);
 
-        // Get the target text from the second module.
-        $params['module'] = $record->module2;
-        $target = $DB->get_record('block_lord_modules', $params);
-        $tparas = $DB->get_records('block_lord_paragraphs', $params);
+            list($similarity, $matrix) = $this->call_bridge($keyname, $targetname);
 
-        $targetparas = [];
-        foreach ($tparas as $para) {
-            $targetparas[] = $para->content;
+            $params = array(
+                'id'       => $record->id,
+                'courseid' => $record->courseid,
+                'module1'  => $record->module1,
+                'module2'  => $record->module2,
+                'compared' => 'name',
+                'value'    => $similarity,
+                'matrix'   => $matrix
+            );
+            $DB->update_record('block_lord_comparisons', $params);
         }
 
         // Compare the introductions of the modules.
-        $keyintrosent = block_lord_split_paragraph($key->intro);
-        $targetintrosent = block_lord_split_paragraph($target->intro);
+        $keyintrosent = block_lord_split_paragraph($data[$record->module1]['intro']);
+        $targetintrosent = block_lord_split_paragraph($data[$record->module2]['intro']);
         $params = [];
         $didcomparison = false;
 
@@ -421,6 +437,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
                 // Only check the similarity if it has not been checked already.
                 if (!isset($compared[$record->module1][$record->module2]['intro'.$ks.'x'.$ts])) {
                     self::dbug('Comparing intros: '.$ks.' x '.$ts);
+                    $compared[$record->module1][$record->module2]['intro'.$ks.'x'.$ts] = 1;
 
                     list($similarity, $matrix) = $this->call_bridge($keysent, $targetsent);
 
@@ -444,15 +461,15 @@ class compare_learning_objects extends \core\task\scheduled_task {
         // Compare the paragraphs and sentences.
         $params = [];
         for ($p0 = 0; $p0 < $this->maxparagraph; $p0++) {
-            if (isset($keyparas[$p0])) {
-                $keyss = block_lord_split_paragraph($keyparas[$p0]);
+            if (isset($data[$record->module1]['paras'][$p0])) {
+                $keyss = block_lord_split_paragraph($data[$record->module1]['paras'][$p0]);
             } else {
                 break;
             }
 
             for ($p1 = 0; $p1 < $this->maxparagraph; $p1++) {
-                if (isset($targetparas[$p1])) {
-                    $targetss = block_lord_split_paragraph($targetparas[$p1]);
+                if (isset($data[$record->module2]['paras'][$p1])) {
+                    $targetss = block_lord_split_paragraph($data[$record->module2]['paras'][$p1]);
                 } else {
                     break;
                 }
@@ -474,6 +491,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
                         // Only check the similarity if it has not been checked already.
                         if (!isset($compared[$record->module1][$record->module2]['P'.$p0.'S'.$s0.'P'.$p1.'S'.$s1])) {
                             self::dbug('Comparing: P'.$p0.' S'.$s0.' x P'.$p1.' S'.$s1);
+                            $compared[$record->module1][$record->module2]['P'.$p0.'S'.$s0.'P'.$p1.'S'.$s1] = 1;
 
                             list($similarity, $matrix) = $this->call_bridge($sentence1, $sentence2);
 
@@ -822,6 +840,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
         $keyname = $this->clean_sentence($key->name);
         $targetname = $this->clean_sentence($target->name);
 
+        self::dbug('Comparing names');
         list($similarity, $matrix) = $this->call_bridge($keyname, $targetname);
 
         $params = array(
@@ -901,8 +920,6 @@ class compare_learning_objects extends \core\task\scheduled_task {
                             break;
                         }
                         self::dbug('Comparing: P'.$p1.' S'.$s1.' x P'.$p2.' S'.$s2);
-                        self::dbug($sentence1);
-                        self::dbug($sentence2);
 
                         list($similarity, $matrix) = $this->call_bridge($sentence1, $sentence2);
 

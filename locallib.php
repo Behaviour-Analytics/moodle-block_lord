@@ -390,6 +390,15 @@ function block_lord_get_node_coords(&$course) {
     if ($usergraph) {
         $params['changed'] = $usergraph->coordsid;
         $usercoords = $DB->get_records('block_lord_coords', $params);
+    } else {
+        return array(
+            'systemgraph' => $systemnodes,
+            'systemscale' => $systemgraph->scale,
+            'systemmindist' => $systemgraph->mindist,
+            'systemmaxdist' => $systemgraph->maxdist,
+            'systemdistscale' => $systemgraph->distscale,
+            'usergraph' => []
+        );
     }
 
     $usernodes = [];
