@@ -240,5 +240,18 @@ function xmldb_block_lord_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2020090201, 'lord');
     }
 
+    if ($oldversion < 2020090600) {
+
+        // Changing precision of field value on table block_lord_comparisons to (20, 18).
+        $table = new xmldb_table('block_lord_comparisons');
+        $field = new xmldb_field('value', XMLDB_TYPE_NUMBER, '20, 18', null, null, null, null, 'compared');
+
+        // Launch change of precision for field value.
+        $dbman->change_field_precision($table, $field);
+
+        // Lord savepoint reached.
+        upgrade_block_savepoint(true, 2020090600, 'lord');
+    }
+
     return true;
 }
