@@ -73,16 +73,12 @@ $DB->insert_record('block_lord_scales', (object) array(
 $data = [];
 foreach ($nodes->links as $link) {
 
-    if (!is_numeric($link->source->id) || !is_numeric($link->target->id)) {
-        continue;
-    }
-
-    $m1 = $link->source->id;
-    $m2 = $link->target->id;
+    $m1 = $link->module1;
+    $m2 = $link->module2;
 
     if ($m1 > $m2) {
-        $m1 = $link->target->id;
-        $m2 = $link->source->id;
+        $m1 = $link->module2;
+        $m2 = $link->module1;
     }
 
     $data[] = (object) array(

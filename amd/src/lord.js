@@ -1635,9 +1635,8 @@
                 }
             });
 
-            // Store distance and node that was used.
+            // Store distance that was used.
             normalized.scale = max;
-            normalized.links = graphData.links;
             normalized.nodes = {};
 
             // Normalize all nodes based on greatest distance.
@@ -1647,6 +1646,21 @@
                     'xcoord': '' + ((dn.x - cx) / max),
                     'ycoord': '' + ((dn.y - cy) / max)
                 };
+            });
+
+            // Get all relevant links and weights.
+            normalized.links = [];
+            graphData.links.forEach(function(l) {
+
+                // Only want links between modules, no grouping links.
+                if (!isNaN(l.source.id) && !isNaN(l.target.id)) {
+
+                    normalized.links[normalized.links.length] = {
+                        module1: l.source.id,
+                        module2: l.target.id,
+                        weight:  l.weight
+                    };
+                }
             });
 
             return normalized;
