@@ -526,6 +526,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
      * resetting errors, which can remove complete comparisons from the DB.
      *
      * @param stdClass $course The course object from the DB.
+     * @param array $compared The modules that have comparisons for in the DB.
      * @return boolean
      */
     private function recheck_comparison_table(&$course, &$compared) {
