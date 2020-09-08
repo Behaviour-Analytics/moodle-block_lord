@@ -348,7 +348,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
             $compared[$c->module1][$c->module2][$c->compared] = 1;
         }
 
-        if ($this->recheck_commparison_table($course, $compared)) {
+        if ($this->recheck_comparison_table($course, $compared)) {
             return;
         }
 
