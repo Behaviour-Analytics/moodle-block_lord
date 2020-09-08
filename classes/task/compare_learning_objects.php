@@ -179,7 +179,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
             // changed, then there may be more comparisons for a given module pair.
             if ($compared > 0 && $compared == $possible) {
                 reset($records);
-                $this->recheck_comparisons($course->id, $records);
+                $this->recheck_comparisons($course, $records);
             }
 
             $this->check_for_new_modules($course);
@@ -325,13 +325,13 @@ class compare_learning_objects extends \core\task\scheduled_task {
      * sentence values have changed since then, some more comarpisons may need
      * to be made.
      *
-     * @param int $courseid The course id.
+     * @param stdClass $course The course object.
      * @param array $comparisons The comparison records
      */
-    private function recheck_comparisons($courseid, &$comparisons) {
+    private function recheck_comparisons($course, &$comparisons) {
         global $DB;
 
-        self::dbug('Rechecking comparisons for course '.$courseid);
+        self::dbug('Rechecking comparisons for course '.$course->id);
 
         // Build an array of all previous comparisons.
         $compared = [];
@@ -348,9 +348,13 @@ class compare_learning_objects extends \core\task\scheduled_task {
             $compared[$c->module1][$c->module2][$c->compared] = 1;
         }
 
+        if ($this->recheck_commparison_table($course, $compared)) {
+            return;
+        }
+
         // Get the module names and intros.
         $data = [];
-        $mods = $DB->get_records('block_lord_modules', ['courseid' => $courseid]);
+        $mods = $DB->get_records('block_lord_modules', ['courseid' => $course->id]);
         foreach ($mods as $mod) {
             $data[$mod->module] = array(
                 'name' => $mod->name,
@@ -360,7 +364,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
         }
 
         // Get the module content data.
-        $paras = $DB->get_records('block_lord_paragraphs', ['courseid' => $courseid], 'module, paragraph');
+        $paras = $DB->get_records('block_lord_paragraphs', ['courseid' => $course->id], 'module, paragraph');
         foreach ($paras as $para) {
             $data[$para->module]['paras'][$para->paragraph] = $para->content;
         }
@@ -515,6 +519,66 @@ class compare_learning_objects extends \core\task\scheduled_task {
         }
 
         return $didcomparison;
+    }
+
+    /**
+     * Called to repopulate the comparison table. This may need to be done after
+     * resetting errors, which can remove complete comparisons from the DB.
+     *
+     * @param stdClass $course The course object from the DB.
+     * @return boolean
+     */
+    private function recheck_comparison_table(&$course, &$compared) {
+        global $DB;
+
+        $modules = $this->get_course_modules($course);
+        $comparisons = [];
+        $seen = [];
+
+        // Determine which modules need to be compared.
+        foreach ($modules as $key1 => $mod1) {
+            foreach ($modules as $key2 => $mod2) {
+
+                $k1 = $key1;
+                $k2 = $key2;
+
+                // Don't compare a module to itself.
+                if ($k1 == $k2) {
+                    continue;
+                }
+                // Keep modules ordered, easier to avoid duplicates.
+                if ($k2 < $k1) {
+                    $temp = $k1;
+                    $k1 = $k2;
+                    $k2 = $temp;
+                }
+
+                // Ensure this module combination has not been compared already.
+                $key = $k1.'_'.$k2;
+                if (isset($seen[$key])) {
+                    continue;
+                }
+                $seen[$key] = 1;
+
+                // If not in compared, then comparison missing from table.
+                if (!isset($compared[$k1][$k2])) {
+                    self::dbug('Adding back missing comparison '.$k1.' '.$k2);
+                    $comparisons[] = (object) array(
+                        'courseid' => $course->id,
+                        'module1'  => $k1,
+                        'module2'  => $k2
+                    );
+                }
+            }
+        }
+
+        // Populate the table with missing data.
+        if (count($comparisons) > 0) {
+            $DB->insert_records('block_lord_comparisons', $comparisons);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -735,13 +799,12 @@ class compare_learning_objects extends \core\task\scheduled_task {
     }
 
     /**
-     * Called to populate the comparison table.
+     * Called to get the course module information.
      *
      * @param stdClass $course The course object from the DB.
      * @return array
      */
-    private function initialize_comparison_table(&$course) {
-        global $DB;
+    private function get_course_modules(&$course) {
 
         // Get course module information and process.
         $modinfo = get_fast_modinfo($course);
@@ -761,6 +824,19 @@ class compare_learning_objects extends \core\task\scheduled_task {
             }
         }
 
+        return $modules;
+    }
+
+    /**
+     * Called to populate the comparison table.
+     *
+     * @param stdClass $course The course object from the DB.
+     * @return array
+     */
+    private function initialize_comparison_table(&$course) {
+        global $DB;
+
+        $modules = $this->get_course_modules($course);
         $comparisons = [];
         $seen = [];
 
