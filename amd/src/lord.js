@@ -114,6 +114,17 @@
                 'book':          'magenta',
                 'page':          'cyan',
                 'lesson':        'brown',
+                'data':          'coral',
+                'chat':          'maroon',
+                'choice':        'grey',
+                'feedback':      'lime',
+                'glossary':      'navy',
+                'survey':        'tan',
+                'wiki':          'teal',
+                'workshop':      'silver',
+                'scorm':         'tomato',
+                'imscp':         'lightpink',
+                'folder':        'peru',
             };
 
             width = window.innerWidth - 150;
