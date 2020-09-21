@@ -881,6 +881,7 @@
             getData({});
             initGraph(tick, false);
             document.getElementById('save-graph').style.display = 'none';
+            clearContents();
 
             // Store last used slider values.
             distanceScales = {
