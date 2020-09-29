@@ -1267,17 +1267,16 @@ class compare_learning_objects extends \core\task\scheduled_task {
         $query = "SELECT cms.*
                     FROM {chat_messages} cms
                     JOIN {chat} c ON c.id = cms.chatid
-                   WHERE c.id = ? AND c.course = ?
+                   WHERE c.course = ?
                 ORDER BY cms.id ASC";
 
-        $messages = $DB->get_records_sql($query, array($cm->instance, $course->id));
+        $messages = $DB->get_records_sql($query, array($course->id));
 
         $msgs = [];
         foreach ($messages as $msg) {
-            if ($msg->message == 'enter' || $msg->message == 'exit') {
-                continue;
+            if ($msg->issystem == 0) {
+                $msgs[] = strip_tags($msg->message);
             }
-            $msgs[] = strip_tags($msg->message);
         }
 
         return array_merge($intro, array('paragraphs' => $msgs));
