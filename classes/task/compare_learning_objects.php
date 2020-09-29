@@ -1469,7 +1469,10 @@ class compare_learning_objects extends \core\task\scheduled_task {
         $paras = [];
         if ($wiki->wikimode == 'collaborative') {
             $page = $DB->get_record('wiki_pages', array('subwikiid' => $cm->instance));
-            $paras[] = strip_tags($page->title) . '. ' . strip_tags($page->cachedcontent);
+
+            if ($page) {
+                $paras[] = strip_tags($page->title) . '. ' . strip_tags($page->cachedcontent);
+            }
         }
 
         return array_merge($intro, array('paragraphs' => $paras));
@@ -1751,7 +1754,7 @@ class compare_learning_objects extends \core\task\scheduled_task {
             // which produces the text/plain mime type, but isn't.
             $dom = new \DOMDocument();
             @$dom->loadHTML($contents);
-            if ($dom->doctype->name == 'html') {
+            if (!empty($dom->doctype->name) && $dom->doctype->name == 'html') {
                 return $this->parse_html($contents, true);
             }
 
