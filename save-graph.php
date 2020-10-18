@@ -55,6 +55,12 @@ foreach ($nodes->nodes as $key => $value) {
         'ycoord'   => $value->ycoord,
         'visible'  => 1
     );
+    // Copy nodes for use in centroid calculations.
+    $nds[$key] = array(
+        'xcoord'   => $value->xcoord,
+        'ycoord'   => $value->ycoord,
+        'visible'  => 1
+    );
 }
 // Store new node coordinates.
 $DB->insert_records('block_lord_coords', $data);
@@ -91,6 +97,15 @@ foreach ($nodes->links as $link) {
 }
 // Store new links.
 $DB->insert_records('block_lord_links', $data);
+
+// Insert or update student centroids and centres or will cause problems
+// later with scheduled task.
+if ($DB->record_exists('block', ['name' => 'behaviour'])) {
+
+    require_once("$CFG->dirroot/blocks/behaviour/locallib.php");
+
+    block_behaviour_update_centroids_and_centres($courseid, $USER->id, $coordsid, $nds);
+}
 
 die('Graph configuration saved.');
 
