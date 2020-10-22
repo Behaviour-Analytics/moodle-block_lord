@@ -98,14 +98,5 @@ foreach ($nodes->links as $link) {
 // Store new links.
 $DB->insert_records('block_lord_links', $data);
 
-// Insert or update student centroids and centres or will cause problems
-// later with scheduled task.
-if ($DB->record_exists('block', ['name' => 'behaviour'])) {
-
-    require_once("$CFG->dirroot/blocks/behaviour/locallib.php");
-
-    block_behaviour_update_centroids_and_centres($courseid, $USER->id, $coordsid, $nds);
-}
-
 die('Graph configuration saved.');
 
