@@ -60,6 +60,10 @@ echo html_writer::empty_tag('br');
 echo html_writer::tag('a', get_string('docs:settings', 'block_lord'), array(
     'href' => new moodle_url('/blocks/lord/documentation.php#settings', $cid)));
 echo html_writer::empty_tag('br');
+
+echo html_writer::tag('a', get_string('docs:issues', 'block_lord'), array(
+    'href' => 'https://github.com/Behaviour-Analytics/moodle-block_lord/issues'));
+echo html_writer::empty_tag('br');
 echo html_writer::empty_tag('br');
 
 // What is LORD?

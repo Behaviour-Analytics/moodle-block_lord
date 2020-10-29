@@ -139,11 +139,14 @@ class block_lord extends block_base {
         $this->content->text .= html_writer::empty_tag('br');
 
         // Link for debugging comparison errors.
-        $this->content->text .= html_writer::tag('a', get_string('debugcomparisons', 'block_lord'),
-            array('href' => new moodle_url('/blocks/lord/debug.php', array(
-                'id' => $COURSE->id
-            ))));
-        $this->content->text .= html_writer::empty_tag('br');
+        $showdebuglink = false;
+        if ($showdebuglink) {
+            $this->content->text .= html_writer::tag('a', get_string('debugcomparisons', 'block_lord'),
+                array('href' => new moodle_url('/blocks/lord/debug.php', array(
+                    'id' => $COURSE->id
+                ))));
+            $this->content->text .= html_writer::empty_tag('br');
+        }
 
         // Link for documentation page.
         $this->content->text .= html_writer::tag('a', get_string("documentation", "block_lord"),

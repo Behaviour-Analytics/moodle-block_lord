@@ -483,21 +483,21 @@ class block_lord_reset_form extends moodleform {
         $mform->addElement('text', 'num_paras', get_string('numparas', 'block_lord'));
         $mform->setType('num_paras', PARAM_INT);
         $mform->addRule('num_paras', get_string('formerror', 'block_lord'),
-            'regex', '/^[1-9][0-9]*$/', 'client', true);
+            'regex', '/^[1-9][0-9]{0,2}$/', 'client', true);
         $mform->setDefault('num_paras', $maxparas);
 
         // Text entry box for maximum number of sentences.
         $mform->addElement('text', 'num_sentence', get_string('numsentence', 'block_lord'));
         $mform->setType('num_sentence', PARAM_INT);
         $mform->addRule('num_sentence', get_string('formerror', 'block_lord'),
-            'regex', '/^[1-9][0-9]*$/', 'client', true);
+            'regex', '/^[1-9][0-9]{0,2}$/', 'client', true);
         $mform->setDefault('num_sentence', $maxsentence);
 
         // Text entry box for maximum number of words.
         $mform->addElement('text', 'num_words', get_string('numwords', 'block_lord'));
         $mform->setType('num_words', PARAM_INT);
         $mform->addRule('num_words', get_string('formerror', 'block_lord'),
-            'regex', '/^[1-9][0-9]*$/', 'client', true);
+            'regex', '/^[1-9][0-9]{0,2}$/', 'client', true);
         $mform->setDefault('num_words', $maxlength);
 
         // Text entry box for name comparison weight.
@@ -553,6 +553,8 @@ class block_lord_reset_form extends moodleform {
         // Text entry for adding a new stop word.
         $mform->addElement('text', 'add_word', get_string('addstopword', 'block_lord'));
         $mform->setType('add_word', PARAM_RAW);
+        $mform->addRule('add_word', get_string('formerror3', 'block_lord'),
+            'regex', '/^[a-zA-z]+$/', 'client', true);
 
         $this->add_action_buttons();
     }

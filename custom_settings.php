@@ -58,12 +58,19 @@ if ($mform->is_cancelled()) {
 } else if ($fromform = $mform->get_data()) {
     // Handle submitted form.
 
+    // When discovery turned off globally, checkbox won't show on page.
+    if (isset($fromform->start_discovery)) {
+        $startdiscovery = intval($fromform->start_discovery);
+    } else {
+        $startdiscovery = 0;
+    }
+
     // Get custom settings, if exist.
     $record = $DB->get_record('block_lord_max_words', ['courseid' => $course->id]);
 
     $params = array(
         'courseid' => $course->id,
-        'dodiscovery' => intval($fromform->start_discovery),
+        'dodiscovery' => $startdiscovery,
         'maxlength' => intval($fromform->num_words),
         'maxsentence' => intval($fromform->num_sentence),
         'maxparas' => intval($fromform->num_paras),
@@ -108,7 +115,7 @@ if ($mform->is_cancelled()) {
     }
 
     // Add a stop word to the dictionary.
-    if ($fromform->add_word && !is_numeric($fromform->add_word)) {
+    if ($fromform->add_word) {
         $word = strtolower($fromform->add_word);
 
         // If word is already in dictionary, change status.
