@@ -136,7 +136,7 @@
             minNodeDist = 25;
             maxNodeDist = 200;
             nodeDistScale = 1000;
-            simulationTimeout = 7000;
+            simulationTimeout = (modules.length) * 200;
 
             assignModuleColours();
 
