@@ -109,13 +109,8 @@ class compare_learning_objects extends \core\task\scheduled_task {
         $this->dictionary = [];
         $words = $DB->get_records('block_lord_dictionary');
 
-        if (count($words) == 0) {
-            $this->add_stop_words_to_dictionary();
-
-        } else {
-            foreach ($words as $word) {
-                $this->dictionary[$word->word] = $word->status;
-            }
+        foreach ($words as $word) {
+            $this->dictionary[$word->word] = $word->status;
         }
 
         // Process each course where this block is installed.
@@ -1789,27 +1784,6 @@ class compare_learning_objects extends \core\task\scheduled_task {
             return $out;
         }
         return $sentence;
-    }
-
-    /**
-     * Function to initialize the dictionary table.
-     */
-    private function add_stop_words_to_dictionary() {
-        global $DB;
-
-        $words = get_string('stopwords', 'block_lord');
-        $words = explode(' ', $words);
-
-        $params = [];
-        foreach ($words as $word) {
-            $params[] = (object) array(
-                'word' => $word,
-                'status' => 2
-            );
-            $this->dictionary[$word] = 2;
-        }
-
-        $DB->insert_records('block_lord_dictionary', $params);
     }
 
     /**

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * The install file for LORD.
  *
  * @package block_lord
  * @author Ted Krahn
@@ -25,7 +25,22 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'block_lord';
-$plugin->release   = '0.7.7';
-$plugin->version   = 2020110900;
-$plugin->requires  = 2017111300;
+/**
+ * Add stop word to the dictionary so it is populated before use.
+ */
+function xmldb_block_lord_install() {
+    global $DB;
+
+    $words = get_string('stopwords', 'block_lord');
+    $words = explode(' ', $words);
+
+    $params = [];
+    foreach ($words as $word) {
+        $params[] = (object) array(
+            'word' => $word,
+            'status' => 2
+        );
+    }
+
+    $DB->insert_records('block_lord_dictionary', $params);
+}
