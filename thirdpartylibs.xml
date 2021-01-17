@@ -8,14 +8,14 @@
         <licenseversion>2.0</licenseversion>
     </library>
     <library>
-        <location>amd/src/modules.js/</location>
+        <location>amd/src/modules.js</location>
         <name>Munkres</name>
         <version>1.0</version>
         <license>Apache License</license>
         <licenseversion>2.0</licenseversion>
     </library>
     <library>
-        <location>amd/build/modules.min.js/</location>
+        <location>amd/build/modules.min.js</location>
         <name>Munkres</name>
         <version>1.0</version>
         <license>Apache License</license>

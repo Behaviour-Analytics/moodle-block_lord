@@ -27,6 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_lord';
 $plugin->release   = '0.7.8';
-$plugin->version   = 2021011700;
+$plugin->version   = 2021011701;
 $plugin->requires  = 2017111300;
 $plugin->maturity  = MATURITY_BETA;
