@@ -8,7 +8,35 @@
         <licenseversion>2.0</licenseversion>
     </library>
     <library>
+        <location>amd/src/modules.js/</location>
+        <name>Munkres</name>
+        <version>1.0</version>
+        <license>Apache License</license>
+        <licenseversion>2.0</licenseversion>
+    </library>
+    <library>
+        <location>amd/build/modules.min.js/</location>
+        <name>Munkres</name>
+        <version>1.0</version>
+        <license>Apache License</license>
+        <licenseversion>2.0</licenseversion>
+    </library>
+    <library>
         <location>javascript/d3/</location>
+        <name>D3</name>
+        <version>5.8.2</version>
+        <license>BSD 3-Clause "New" or "Revised" License</license>
+        <licenseversion>3.0</licenseversion>
+    </library>
+    <library>
+        <location>amd/src/d3.js</location>
+        <name>D3</name>
+        <version>5.8.2</version>
+        <license>BSD 3-Clause "New" or "Revised" License</license>
+        <licenseversion>3.0</licenseversion>
+    </library>
+    <library>
+        <location>amd/build/d3.min.js</location>
         <name>D3</name>
         <version>5.8.2</version>
         <license>BSD 3-Clause "New" or "Revised" License</license>
