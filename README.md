@@ -1,5 +1,8 @@
 # Learning Object Relation Discovery (LORD) #
 
+This repository is deprecated. The source code for this plugin is now hosted at
+https://github.com/VIP-Research-Group/moodle-block_lord
+
 This plugin determines the similarity between all the learning activities in a
 course and uses the similarity to configure a network graph of the activities.
 
